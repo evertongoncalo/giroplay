@@ -1,0 +1,20 @@
+# dependências e saídas de build
+node_modules/
+dist/
+
+# dados gerados ao rodar/testar
+*.log
+*.tmp
+*.part.mp4
+relatorio.json
+
+# sistema / editor
+Thumbs.db
+desktop.ini
+.DS_Store
+.vscode/
+.idea/
+
+# segredos (o app não usa nenhum, mas por garantia)
+.env
+.env.*

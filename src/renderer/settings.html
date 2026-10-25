@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:">
+  <title>GiroPlay · configurações</title>
+  <link rel="stylesheet" href="settings.css">
+</head>
+<body>
+  <header>
+    <div class="brand">GiroPlay</div>
+    <div id="pill" class="pill">…</div>
+  </header>
+
+  <main>
+    <section id="welcome" class="card accent" hidden>
+      <h2>Bem-vindo!</h2>
+      <p>Escolha abaixo a pasta que está sincronizada com o Google Drive e clique em <b>Salvar</b>.
+        Tudo que for enviado para essa pasta entra no final do ciclo do painel, sozinho, sem interromper o vídeo que está passando.</p>
+    </section>
+
+    <section class="card">
+      <h2>No painel agora</h2>
+      <div id="now" class="big">—</div>
+      <div id="cycle" class="muted"></div>
+      <ol id="playlist"></ol>
+    </section>
+
+    <section class="card">
+      <h2>Entrada de vídeos</h2>
+      <div id="ingest">—</div>
+      <div id="barWrap" class="bar" hidden><div id="bar"></div></div>
+      <div id="waiting" class="muted"></div>
+      <ul id="rejected" class="rejected"></ul>
+    </section>
+
+    <section class="card">
+      <h2>Configurações</h2>
+
+      <label for="folder">Pasta com os vídeos (sincronizada com o Google Drive)</label>
+      <div class="row">
+        <input id="folder" readonly placeholder="Nenhuma pasta escolhida">
+        <button id="pick" type="button">Escolher…</button>
+      </div>
+
+      <label for="display">Tela do painel</label>
+      <select id="display"></select>
+
+      <label for="fit">Ajuste da imagem</label>
+      <select id="fit">
+        <option value="contain">Mostrar inteiro (sem cortar; pode sobrar faixa preta)</option>
+        <option value="cover">Preencher a tela (corta as bordas)</option>
+        <option value="fill">Esticar (deforma a imagem)</option>
+      </select>
+
+      <label class="check"><input id="autostart" type="checkbox"> <span>Abrir o GiroPlay junto com o Windows <small id="autostartNote" class="muted"></small></span></label>
+      <label class="check"><input id="statusDrive" type="checkbox"> <span>Gravar o relatório STATUS.txt dentro da pasta do Drive (para ver pelo celular se o painel está no ar)</span></label>
+
+      <div class="row end">
+        <span id="saved" class="muted"></span>
+        <button id="save" class="primary" type="button">Salvar</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Ferramentas</h2>
+      <div class="tools">
+        <button data-action="open-watch" type="button">Abrir pasta de vídeos</button>
+        <button data-action="open-plays" type="button">Relatório de exibições</button>
+        <button data-action="open-logs" type="button">Abrir registros (logs)</button>
+        <button data-action="open-library" type="button">Abrir cópia local</button>
+        <button data-action="rescan" type="button">Verificar a pasta agora</button>
+        <button data-action="restart-player" type="button">Reiniciar a tela do painel</button>
+        <button data-action="quit" type="button" class="danger">Sair do GiroPlay</button>
+      </div>
+    </section>
+  </main>
+
+  <footer id="footer" class="muted"></footer>
+  <script src="settings.js"></script>
+</body>
+</html>

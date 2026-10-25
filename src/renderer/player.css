@@ -1,0 +1,58 @@
+html, body {
+  margin: 0;
+  height: 100%;
+  background: #000;
+  overflow: hidden;
+  cursor: none;
+  user-select: none;
+}
+
+#stage {
+  position: fixed;
+  inset: 0;
+  background: #000;
+}
+
+/* Dois players empilhados. O que toca está embaixo, com opacidade total. O próximo fica POR CIMA, já
+   carregado, mas quase transparente: assim o navegador continua desenhando ele e, na troca, basta
+   subir a opacidade. Com o próximo escondido ATRÁS, a gravação da tela mostrou 1 quadro preto em toda troca
+   (provavelmente porque o navegador não desenha o que está 100% coberto); assim não aparece. */
+video.layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: #000;
+  object-fit: contain;
+  opacity: 1;
+}
+video.layer.back { opacity: 0.02; background: transparent; }
+
+body[data-fit="cover"] video.layer { object-fit: cover; }
+body[data-fit="fill"] video.layer { object-fit: fill; }
+
+/* Tela de espera: aparece só quando não há nenhum vídeo no ciclo. Nunca fica preto puro. */
+#standby {
+  position: fixed;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.2vmin;
+  background: radial-gradient(ellipse at 50% 40%, #1b1740 0%, #0a0a16 70%);
+  color: #e8e8f4;
+  font-family: "Segoe UI", system-ui, sans-serif;
+}
+#standby[hidden] { display: none; }
+#standby .mark {
+  font-size: 12vmin;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  background: linear-gradient(90deg, #7c5cff, #22d3ee);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+#standby .hint { font-size: 3.2vmin; opacity: 0.6; }
