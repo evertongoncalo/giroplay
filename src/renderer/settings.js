@@ -152,9 +152,27 @@ $('stop').addEventListener('click', async () => {
   refresh();
 });
 
-for (const button of document.querySelectorAll('[data-action]')) {
+for (const button of document.querySelectorAll('[data-action]:not([data-action="quit"])')) {
   button.addEventListener('click', () => api.action(button.dataset.action));
 }
+
+// Sair do GiroPlay: confirmação de dois cliques aqui na página (a caixa de diálogo do Windows deixava a
+// saída pendurada), sem janela extra para ficar escondida.
+const quitButton = document.querySelector('[data-action="quit"]');
+let quitTimer = null;
+quitButton.addEventListener('click', () => {
+  if (quitButton.dataset.armed === '1') {
+    clearTimeout(quitTimer);
+    api.action('quit-now');
+    return;
+  }
+  quitButton.dataset.armed = '1';
+  quitButton.textContent = 'Clique de novo para sair';
+  quitTimer = setTimeout(() => {
+    quitButton.dataset.armed = '0';
+    quitButton.textContent = 'Sair do GiroPlay';
+  }, 4000);
+});
 
 refresh();
 setInterval(refresh, 1500);

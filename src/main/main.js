@@ -11,7 +11,7 @@ const { Library } = require('./library');
 const { Media } = require('./media');
 const { Ingest } = require('./ingest');
 const { PlayLog, StatusReporter } = require('./status');
-const { readJson, atomicWriteJson } = require('./util');
+const { readJson, atomicWriteJson, sleep } = require('./util');
 
 // ---------- linha de comando (a maior parte só serve para teste/medição) ----------
 const flag = (name) => process.argv.includes(`--${name}`);
@@ -64,7 +64,15 @@ if (!app.requestSingleInstanceLock()) {
   app.quit();
 } else {
   // Abrir o GiroPlay de novo (atalho, instalador) com ele já rodando traz as configurações para a frente.
-  app.on('second-instance', () => openSettings());
+  // Se este processo já está encerrando, reinicia limpo em vez de reaproveitar o que está morrendo.
+  app.on('second-instance', () => {
+    if (quitting) {
+      app.relaunch();
+      app.exit(0);
+      return;
+    }
+    openSettings();
+  });
   app.whenReady().then(boot).catch((err) => {
     console.error(err);
     app.exit(1);
@@ -108,6 +116,7 @@ async function boot() {
 
   app.on('before-quit', () => {
     quitting = true;
+    armHardExit();
     playing = false;
     saveState();
     try { fs.writeFileSync(path.join(dataDir, 'quit.flag'), String(Date.now())); } catch { /* ignora */ }
@@ -171,20 +180,26 @@ function stopPlayback() {
   logger.info('exibição parada');
 }
 
-async function quitApp() {
-  if (quitting) return;
-  logger.info('saindo do GiroPlay (pedido do usuário)');
-  try { await status.stop(); } catch { /* sai mesmo assim */ }
-  quitting = true;
-  app.quit();
+// Garante que o processo TERMINA. Medido neste projeto: depois de "Sair" pela caixa de confirmação do
+// Windows, o app mandado sair continuou vivo, sem janelas, e passou a ignorar o Esc (o pedido de sair era
+// descartado por "já estar saindo"). Se o encerramento normal não terminar em 2,5 s, encerra à força.
+let hardExitTimer = null;
+function armHardExit() {
+  if (hardExitTimer) return;
+  hardExitTimer = setTimeout(() => {
+    logger.warn('o app não encerrou sozinho em 2,5 s; forçando a saída');
+    try { fs.writeFileSync(path.join(dataDir, 'quit.flag'), String(Date.now())); } catch { /* ignora */ }
+    app.exit(0);
+  }, 2500);
 }
 
-async function confirmQuit() {
-  const answer = await dialog.showMessageBox(settingsWin && !settingsWin.isDestroyed() ? settingsWin : undefined, {
-    type: 'warning', buttons: ['Sair', 'Continuar rodando'], defaultId: 1, cancelId: 1,
-    title: 'GiroPlay', message: 'Sair do GiroPlay?', detail: 'O painel vai ficar sem exibir os vídeos até o app ser aberto de novo.',
-  });
-  if (answer.response === 0) await quitApp();
+// Pedir para sair NUNCA é ignorado: cada chamada refaz o pedido e confirma o prazo de encerramento.
+async function quitApp() {
+  logger.info('saindo do GiroPlay (pedido do usuário)');
+  quitting = true;
+  armHardExit();
+  try { await Promise.race([status.stop(), sleep(1000)]); } catch { /* sai mesmo assim */ }
+  app.quit();
 }
 
 // ---------- janela do painel ----------
@@ -379,7 +394,7 @@ function refreshTray() {
       : { label: '▶ Iniciar painel', click: startPlayback },
     { label: 'Abrir pasta de vídeos', click: () => { const f = config.get().watchFolder; if (f) shell.openPath(f); } },
     { type: 'separator' },
-    { label: 'Sair do GiroPlay', click: confirmQuit },
+    { label: 'Sair do GiroPlay', click: quitApp },
   ]));
 }
 
@@ -502,7 +517,7 @@ function registerIpc() {
       case 'open-plays': await shell.openPath(path.join(dataDir, 'exibicoes')); break;
       case 'rescan': ingest.rescan(); break;
       case 'restart-player': if (playerWin && !playerWin.isDestroyed()) playerWin.webContents.reload(); break;
-      case 'quit': await confirmQuit(); break;
+      case 'quit-now': await quitApp(); break; // a confirmação (dois cliques) é feita na própria página
       default: break;
     }
   });
@@ -597,6 +612,16 @@ async function testAction(action, seconds) {
     case 'p': key('p'); break;
     case 'enter': key('Enter'); break;
     case 'altf4': if (playerWin && !playerWin.isDestroyed()) playerWin.close(); break;
+    case 'close-settings': if (settingsWin && !settingsWin.isDestroyed()) settingsWin.close(); break; // o X da janela de configurações
+    case 'quit-app': quitApp(); break;
+    // o botão "Sair do GiroPlay" da janela de configurações: dois cliques seguidos (confirmação na página)
+    case 'settings-quit':
+      if (settingsWin && !settingsWin.isDestroyed()) {
+        settingsWin.webContents.executeJavaScript("(() => { const b = document.querySelector('[data-action=\"quit\"]'); b.click(); setTimeout(() => b.click(), 300); })()").catch(() => {});
+      }
+      break;
+    // simula o estado preso visto no PC do usuário: o app acha que já está saindo, mas não saiu
+    case 'zumbi': quitting = true; break;
     case 'shot-player': if (playerWin && !playerWin.isDestroyed()) await shot(playerWin, 'painel'); break;
     case 'shot-settings': if (settingsWin && !settingsWin.isDestroyed()) await shot(settingsWin, 'configuracoes'); break;
     case 'dump': {

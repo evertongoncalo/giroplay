@@ -181,6 +181,42 @@ const scenarios = {
     await app.exited;
     killAll(app.dados);
   },
+
+  // ---------- 7. o caso real do usuário: reproduzindo vídeo, app preso, Esc Esc ----------
+  7: async () => {
+    console.log('7) Reproduzindo vídeo com o app "preso" (achando que já está saindo): Esc, Esc tem que sair mesmo assim');
+    const t0 = Date.now();
+    const app = launch(['--play', '--test-script=6:zumbi,8:esc,10:esc', '--exit-after=45']);
+    await waitLog(app, /tocando:/, 1, 40000);
+    const code = await Promise.race([app.exited, sleep(35000).then(() => 'tempo')]);
+    const secs = (Date.now() - t0) / 1000;
+    check('o app saiu sozinho (não só pelo limite de segurança do teste)', code === 0 && secs < 30, `código ${code}, ${secs.toFixed(1)} s`);
+    check('registrou a saída pelo menu', /saída pelo menu do painel/.test(app.log()));
+    killAll(app.dados);
+  },
+
+  // ---------- 8. botão "Sair do GiroPlay" das configurações (dois cliques) ----------
+  8: async () => {
+    console.log('8) Botão "Sair do GiroPlay" das configurações (dois cliques, sem caixa do Windows)');
+    const t0 = Date.now();
+    const app = launch(['--test-script=6:settings-quit', '--exit-after=45']);
+    const code = await Promise.race([app.exited, sleep(35000).then(() => 'tempo')]);
+    const secs = (Date.now() - t0) / 1000;
+    check('o app saiu sozinho', code === 0 && secs < 30, `código ${code}, ${secs.toFixed(1)} s`);
+    check('registrou o pedido de saída', /saindo do GiroPlay/.test(app.log()));
+    killAll(app.dados);
+  },
+
+  // ---------- 9. fechar a janela de configurações antes de iniciar encerra o app ----------
+  9: async () => {
+    console.log('9) Fechar a janela de configurações no X, antes de iniciar o painel, encerra o app');
+    const t0 = Date.now();
+    const app = launch(['--test-script=6:close-settings', '--exit-after=45']);
+    const code = await Promise.race([app.exited, sleep(35000).then(() => 'tempo')]);
+    const secs = (Date.now() - t0) / 1000;
+    check('o app saiu sozinho', code === 0 && secs < 30, `código ${code}, ${secs.toFixed(1)} s`);
+    killAll(app.dados);
+  },
 };
 
 (async () => {

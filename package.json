@@ -1,7 +1,7 @@
 {
   "name": "giroplay",
   "productName": "GiroPlay",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Player de vídeos em loop contínuo para painel de rua, alimentado por uma pasta sincronizada do Google Drive",
   "author": "GiroPlay",
   "license": "UNLICENSED",

@@ -4,7 +4,7 @@ Player de vídeos em **loop contínuo e sem corte** para painéis de rua (LED / 
 
 Você joga os vídeos numa **pasta do Google Drive**, de qualquer lugar (celular, outro PC). O GiroPlay vigia a pasta, confere cada vídeo, e o coloca **no fim do ciclo**, sem interromper o que está passando.
 
-> Status: versão 0.1.1, testada em um PC de desenvolvimento. Veja [o que foi e o que não foi testado](#o-que-foi-medido-e-o-que-não-foi) e o [histórico de versões](#histórico-de-versões).
+> Status: versão 0.1.2, testada em um PC de desenvolvimento. Veja [o que foi e o que não foi testado](#o-que-foi-medido-e-o-que-não-foi) e o [histórico de versões](#histórico-de-versões).
 
 ---
 
@@ -90,7 +90,7 @@ O GiroPlay usa **tela cheia** na tela escolhida. Com HDMI direto, ele passa o qu
 | Trocar um vídeo mantendo a posição | Envie outro com o **mesmo nome** |
 | Controlar a ordem | Use prefixos de nome (`01_`, `02_`…) na primeira carga |
 | Abrir as configurações | `Esc` e depois `C`; ou `Ctrl + Alt + G` / `Ctrl + Shift + G`; ou o ícone do GiroPlay na bandeja |
-| Fechar o GiroPlay | `Esc` duas vezes (ou configurações → **Sair do GiroPlay**) |
+| Fechar o GiroPlay | `Esc` duas vezes (ou configurações → **Sair do GiroPlay**, que pede dois cliques) |
 | Parar a exibição sem fechar o app | `Esc` e depois `P` |
 
 ### Sair da tela cheia (tecla Esc)
@@ -107,7 +107,7 @@ O painel em tela cheia nunca deve te deixar sem saída. Com ele na frente:
 | `Alt + F4` | Abre o mesmo menu (não derruba o painel de repente) |
 | `Ctrl + Alt + G` ou `Ctrl + Shift + G` | Abrem o menu de qualquer lugar, mesmo sem o painel em foco (dois atalhos porque `Ctrl+Alt` é "AltGr" em alguns teclados) |
 
-O menu fica dentro da própria página do painel, então nenhuma janela do Windows consegue ficar na frente dele. Ele some sozinho depois de uns segundos. Se tudo falhar, o ícone do GiroPlay na bandeja do Windows e o Gerenciador de Tarefas continuam funcionando.
+A saída **sempre termina**: ao pedir para sair, o app encerra o processo à força em até 2,5 s se o encerramento normal não terminar, e pedir para sair de novo nunca é ignorado. O menu fica dentro da própria página do painel, então nenhuma janela do Windows consegue ficar na frente dele. Ele some sozinho depois de uns segundos. Se tudo falhar, o ícone do GiroPlay na bandeja do Windows e o Gerenciador de Tarefas continuam funcionando.
 
 ### Acompanhar sem ir até o painel
 
@@ -207,7 +207,7 @@ Com o app rodando de verdade: queda do processo (reaberto em ~5 s e voltou a toc
 
 ### Abrir, iniciar e sair (`node tools/test-fluxo.js`)
 
-Roda o app de verdade, **em tela cheia**, em 6 cenários (23 verificações) e pergunta ao Windows, com `WindowFromPoint`, qual janela está **visível no centro da tela** e **na faixa de baixo** (onde fica a barra de tarefas):
+Roda o app de verdade, **em tela cheia**, em 9 cenários (28 verificações) e pergunta ao Windows, com `WindowFromPoint`, qual janela está **visível no centro da tela** e **na faixa de baixo** (onde fica a barra de tarefas):
 
 1. **Primeiro uso**, sem configuração salva: abre só as configurações, o painel não entra em tela cheia e nenhum vídeo toca sozinho.
 2. **▶ Iniciar** leva à tela cheia, por cima, **cobrindo a barra de tarefas do Windows**; **Esc** abre o menu; **C** coloca as configurações **por cima do painel** (3 medições seguidas).
@@ -215,13 +215,16 @@ Roda o app de verdade, **em tela cheia**, em 6 cenários (23 verificações) e p
 4. **Alt+F4** abre o menu em vez de derrubar o painel.
 5. **Esc, P** para a exibição e volta às configurações.
 6. **`--retomar`** (guardião reabrindo depois de uma queda) e **"iniciar sozinho"** começam já exibindo.
+7. **Reproduzindo vídeo com o app "preso"** (achando que já está saindo): Esc, Esc sai mesmo assim, sozinho e em poucos segundos. Este cenário foi conferido de verdade: reintroduzindo o defeito de propósito, ele **falha**.
+8. **Botão "Sair do GiroPlay"** das configurações (dois cliques, sem caixa do Windows) encerra o app.
+9. **Fechar a janela de configurações no X** antes de iniciar o painel encerra o app.
 
 Todos passaram. Esse teste existe por causa de falhas reais da 0.1.0 (veja o [histórico](#histórico-de-versões)). Medindo, ele (e as ferramentas `tools/topwindow.ps1`, `windows-stack.ps1` e `fullscreen-check.ps1`) achou duas coisas do Windows/Electron:
 
 - **A barra de tarefas aparecia por baixo do painel.** Com `resizable: false`, a "tela cheia" do Electron ficava do tamanho da área útil (**1934×1039** numa tela 1920×1080) e a barra (`Shell_TrayWnd`, 48 px) era a janela visível na faixa de baixo. Com `resizable: true`, ou no modo quiosque, a janela mede **1920×1080**. O painel agora é criado assim e o app confere o tamanho real depois de entrar em tela cheia, corrigindo se não bater.
 - **O Windows ignora o primeiro pedido de "sempre por cima"** de uma janela logo depois de o painel em tela cheia ceder o topo. Por isso o app reafirma o pedido e confere com `isAlwaysOnTop()`.
 
-O mesmo teste foi rodado também **no app empacotado** (`node tools/test-fluxo.js --exe=dist/win-unpacked/GiroPlay.exe`, o que o instalador coloca no PC): 23 de 23.
+Os 9 cenários foram rodados também **no app empacotado** (`node tools/test-fluxo.js --exe=dist/win-unpacked/GiroPlay.exe`, o que o instalador coloca no PC): 28 de 28.
 
 ### O que NÃO foi testado
 
@@ -292,6 +295,7 @@ node tools/test-fluxo.js --exe=dist/win-unpacked/GiroPlay.exe   # o mesmo, no ap
 | Sintoma | O que verificar |
 |---|---|
 | O painel está em tela cheia e não consigo sair | Tecla `Esc` (menu), `Esc` de novo sai. Se o teclado não responder: `Ctrl + Alt + G` ou `Ctrl + Shift + G`; o ícone do GiroPlay na bandeja; ou o Gerenciador de Tarefas (`Ctrl + Shift + Esc`) |
+| O Esc não sai / abrir o GiroPlay não adianta | Pode haver um GiroPlay **antigo travado em segundo plano** (versão 0.1.1 ou anterior): no Gerenciador de Tarefas, finalize todos os processos "GiroPlay". Na 0.1.2 isso não acontece mais |
 | Abre e não toca nada | É o esperado até clicar em **▶ Iniciar painel** (ou marcar "Iniciar o painel sozinho") |
 | "Pasta inacessível" | O Google Drive está aberto e conectado? O painel segue tocando a cópia local |
 | Vídeo não aparece no ciclo | Veja `STATUS.txt` ou a janela de configurações: pode estar esperando terminar de chegar, na fila de conversão ou **recusado** (motivo anotado) |
@@ -303,6 +307,12 @@ node tools/test-fluxo.js --exe=dist/win-unpacked/GiroPlay.exe   # o mesmo, no ap
 ---
 
 ## Histórico de versões
+
+**0.1.2**
+- **O Esc deixava de funcionar** depois de um "Sair" que não terminava. Nos logs de um PC real, o app mandado sair **continuou vivo, sem janelas**, e a partir daí **ignorava qualquer novo pedido de sair** (a função de sair retornava logo por "já estar saindo"): o Esc ficou registrado dezenas de vezes sem efeito, e abrir o GiroPlay de novo reaproveitava esse processo preso. O travamento foi reproduzido em teste ao sair pela **caixa de confirmação do Windows** do botão "Sair" (não foi possível confirmar qual caminho o usuário usou).
+- Agora a saída **sempre termina**: o processo é encerrado à força em até 2,5 s se o encerramento normal não terminar, e pedir para sair nunca é ignorado. Abrir o GiroPlay enquanto outro está encerrando reinicia limpo.
+- O botão "Sair do GiroPlay" das configurações pede **dois cliques** na própria janela, em vez da caixa de diálogo do Windows.
+- Novos cenários de teste (7 a 9), conferidos reintroduzindo o defeito de propósito.
 
 **0.1.1**
 - O app **abre sempre nas configurações** e só vai para a tela cheia depois de **▶ Iniciar painel** (ou com "iniciar sozinho" ligado / `--play`).
