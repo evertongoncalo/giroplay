@@ -4,7 +4,7 @@ Player de vídeos em **loop contínuo e sem corte** para painéis de rua (LED / 
 
 Você joga os vídeos numa **pasta do Google Drive**, de qualquer lugar (celular, outro PC). O GiroPlay vigia a pasta, confere cada vídeo, e o coloca **no fim do ciclo**, sem interromper o que está passando.
 
-> Status: versão 0.1.0, testada em um PC de desenvolvimento. Veja [o que foi e o que não foi testado](#o-que-foi-medido-e-o-que-não-foi).
+> Status: versão 0.1.1, testada em um PC de desenvolvimento. Veja [o que foi e o que não foi testado](#o-que-foi-medido-e-o-que-não-foi) e o [histórico de versões](#histórico-de-versões).
 
 ---
 
@@ -62,20 +62,21 @@ Formatos aceitos: `mp4, m4v, mov, mkv, avi, webm, wmv, mpg, mpeg, mts, m2ts, flv
 1. Instale o **Google Drive para computador** e entre na sua conta.
 2. Crie uma pasta só para o painel (por exemplo `Painel`) e deixe-a **disponível off-line / espelhada**, para os arquivos ficarem de fato no disco do PC. (O modo "streaming" também funciona, mas cada vídeo novo precisa ser baixado na primeira leitura.)
 3. Instale o GiroPlay (`GiroPlay Setup x.y.z.exe`) ou rode do código-fonte (veja [Desenvolvimento](#desenvolvimento)).
-4. Na primeira abertura, a janela de **configurações** aparece: escolha a pasta do Drive, a tela do painel e clique em **Salvar**.
+4. O GiroPlay **abre sempre na janela de configurações**, nunca direto em tela cheia. Escolha a pasta do Drive, confira a tela do painel e clique em **▶ Iniciar painel**. Só então ele passa para a tela cheia e começa a exibir.
+5. Para sair da tela cheia depois: tecla **Esc** (veja [Sair da tela cheia](#sair-da-tela-cheia-tecla-esc)).
 
 ### 2. Ligação com o painel
 
 O GiroPlay usa **tela cheia** na tela escolhida. Com HDMI direto, ele passa o que está na tela do PC para o painel.
 
 - **Duas telas (estendida):** o painel é a segunda tela; o GiroPlay a usa sozinho, e você continua usando a principal.
-- **Tela única / espelhada:** o GiroPlay ocupa a tela inteira. Para abrir as configurações: `Ctrl + Alt + G` ou o ícone na bandeja.
+- **Tela única / espelhada:** o GiroPlay ocupa a tela inteira. Para voltar ao Windows: tecla `Esc` (duas vezes sai do app) ou `Esc` e depois `C` para as configurações.
 - Se a controladora do painel lê só uma parte da saída HDMI, ajuste a resolução do Windows para a que a controladora espera.
 
 ### 3. Rodar 24 h
 
-- Marque **"Abrir o GiroPlay junto com o Windows"** nas configurações (só no app instalado).
-- O **guardião** reabre o app se ele cair ou travar (veja abaixo).
+- Marque **"Iniciar o painel sozinho assim que o GiroPlay abrir"** e **"Abrir o GiroPlay junto com o Windows"** nas configurações (a segunda só vale no app instalado). Sem a primeira, o app abre nas configurações e espera o ▶ Iniciar, o que é o certo para testar, mas não para o painel voltar sozinho depois de reiniciar o PC.
+- O **guardião** reabre o app, já exibindo, se ele cair ou travar (veja abaixo).
 - O app impede a tela de apagar/descansar enquanto roda. Mesmo assim, desative a suspensão e o bloqueio automático do Windows e as atualizações que reiniciam o PC fora de hora.
 
 ---
@@ -88,8 +89,25 @@ O GiroPlay usa **tela cheia** na tela escolhida. Com HDMI direto, ele passa o qu
 | Tirar um vídeo | Apague da pasta do Drive |
 | Trocar um vídeo mantendo a posição | Envie outro com o **mesmo nome** |
 | Controlar a ordem | Use prefixos de nome (`01_`, `02_`…) na primeira carga |
-| Abrir as configurações | `Ctrl + Alt + G`, ou o ícone do GiroPlay na bandeja |
-| Fechar o GiroPlay | Configurações → **Sair do GiroPlay** (Alt+F4 não fecha, de propósito) |
+| Abrir as configurações | `Esc` e depois `C`; ou `Ctrl + Alt + G` / `Ctrl + Shift + G`; ou o ícone do GiroPlay na bandeja |
+| Fechar o GiroPlay | `Esc` duas vezes (ou configurações → **Sair do GiroPlay**) |
+| Parar a exibição sem fechar o app | `Esc` e depois `P` |
+
+### Sair da tela cheia (tecla Esc)
+
+O painel em tela cheia nunca deve te deixar sem saída. Com ele na frente:
+
+| Tecla | O que faz |
+|---|---|
+| `Esc` | Abre um **menu dentro do próprio painel** (o vídeo continua passando por trás) |
+| `Esc` de novo | **Sai do GiroPlay** |
+| `C` | Abre as configurações, **por cima** do painel |
+| `P` | Para a exibição e volta às configurações |
+| `Enter` | Fecha o menu e continua |
+| `Alt + F4` | Abre o mesmo menu (não derruba o painel de repente) |
+| `Ctrl + Alt + G` ou `Ctrl + Shift + G` | Abrem o menu de qualquer lugar, mesmo sem o painel em foco (dois atalhos porque `Ctrl+Alt` é "AltGr" em alguns teclados) |
+
+O menu fica dentro da própria página do painel, então nenhuma janela do Windows consegue ficar na frente dele. Ele some sozinho depois de uns segundos. Se tudo falhar, o ícone do GiroPlay na bandeja do Windows e o Gerenciador de Tarefas continuam funcionando.
 
 ### Acompanhar sem ir até o painel
 
@@ -109,11 +127,11 @@ O CSV tem uma linha por exibição (início, fim, duração, vídeo, se tocou co
 
 ## Guardião (reabre sozinho)
 
-Ao iniciar, o app lança um processo pequeno que o vigia:
+Quando a exibição começa (▶ Iniciar), o app lança um processo pequeno que o vigia. Antes disso, nas configurações, não há nada para vigiar.
 
 | Situação | O que o guardião faz |
 |---|---|
-| O processo do app some (queda, falta de memória) | Reabre em poucos segundos |
+| O processo do app some (queda, falta de memória) | Reabre em poucos segundos, **já exibindo** (sem esperar o ▶ Iniciar) |
 | O app fica 90 s sem dar sinal de vida (travado) | Encerra e reabre |
 | O app fecha pelo menu **Sair** | Não reabre; o guardião encerra |
 | O app cai de novo logo após abrir | Espera 15 s antes de tentar outra vez (evita laço de reaberturas) |
@@ -128,6 +146,8 @@ As opções da janela ficam em `%LOCALAPPDATA%\GiroPlay\config.json`. Chaves adi
 
 | Chave | Padrão | Para que serve |
 |---|---|---|
+| `autoStart` | `false` | Começa a exibir sozinho ao abrir (também está na janela). Desligado, abre nas configurações |
+| `launchAtLogin` | `false` | Abre o GiroPlay junto com o Windows (também na janela; só no app instalado) |
 | `fit` | `contain` | `contain` mostra inteiro (pode ter faixas pretas), `cover` preenche cortando, `fill` estica |
 | `maxWidth` / `maxHeight` | `1920` / `1080` | Acima disso o vídeo é reduzido na conversão |
 | `maxFps` | `60` | Acima disso a conversão limita o fps |
@@ -185,12 +205,30 @@ Cobrem, com vídeos reais gerados pelo ffmpeg: arquivo chegando **devagar** (nad
 
 Com o app rodando de verdade: queda do processo (reaberto em ~5 s e voltou a tocar), travamento com o processo suspenso (encerrado e reaberto), e saída de propósito (não reabre, o guardião encerra).
 
+### Abrir, iniciar e sair (`node tools/test-fluxo.js`)
+
+Roda o app de verdade, **em tela cheia**, em 6 cenários (23 verificações) e pergunta ao Windows, com `WindowFromPoint`, qual janela está **visível no centro da tela** e **na faixa de baixo** (onde fica a barra de tarefas):
+
+1. **Primeiro uso**, sem configuração salva: abre só as configurações, o painel não entra em tela cheia e nenhum vídeo toca sozinho.
+2. **▶ Iniciar** leva à tela cheia, por cima, **cobrindo a barra de tarefas do Windows**; **Esc** abre o menu; **C** coloca as configurações **por cima do painel** (3 medições seguidas).
+3. **Esc, Esc** fecha o app de verdade e o guardião não o reabre.
+4. **Alt+F4** abre o menu em vez de derrubar o painel.
+5. **Esc, P** para a exibição e volta às configurações.
+6. **`--retomar`** (guardião reabrindo depois de uma queda) e **"iniciar sozinho"** começam já exibindo.
+
+Todos passaram. Esse teste existe por causa de falhas reais da 0.1.0 (veja o [histórico](#histórico-de-versões)). Medindo, ele (e as ferramentas `tools/topwindow.ps1`, `windows-stack.ps1` e `fullscreen-check.ps1`) achou duas coisas do Windows/Electron:
+
+- **A barra de tarefas aparecia por baixo do painel.** Com `resizable: false`, a "tela cheia" do Electron ficava do tamanho da área útil (**1934×1039** numa tela 1920×1080) e a barra (`Shell_TrayWnd`, 48 px) era a janela visível na faixa de baixo. Com `resizable: true`, ou no modo quiosque, a janela mede **1920×1080**. O painel agora é criado assim e o app confere o tamanho real depois de entrar em tela cheia, corrigindo se não bater.
+- **O Windows ignora o primeiro pedido de "sempre por cima"** de uma janela logo depois de o painel em tela cheia ceder o topo. Por isso o app reafirma o pedido e confere com `isAlwaysOnTop()`.
+
+O mesmo teste foi rodado também **no app empacotado** (`node tools/test-fluxo.js --exe=dist/win-unpacked/GiroPlay.exe`, o que o instalador coloca no PC): 23 de 23.
+
 ### O que NÃO foi testado
 
 - **Num painel de LED / controladora real.** Foi testado só na tela do PC. A saída HDMI, a resolução que a controladora espera e o recorte da imagem precisam ser conferidos no local.
 - **Com o aplicativo do Google Drive de verdade.** O Drive não estava instalado no PC de teste; a pasta sincronizada foi simulada com uma pasta local (inclusive upload lento e pasta que some). O comportamento com o cliente real (arquivos temporários, modo streaming) não foi observado.
 - **Execução por horas ou dias.** O teste de memória é acelerado (clipes de 2 s), não substitui a observação em campo.
-- **O instalador numa máquina limpa** e o **início junto com o Windows**. O instalador (`npm run dist`) foi gerado e a versão empacotada (`dist/win-unpacked`) foi testada com `node tools/test-packaged.js` (ffmpeg embutido, cópia e conversão, exibição, guardião), mas o instalador em si não foi executado, e a opção de abrir com o Windows só age no app instalado.
+- **O instalador numa máquina limpa** e o **início junto com o Windows**. O instalador (`npm run dist`) foi gerado e a versão empacotada (`dist/win-unpacked`) foi testada com `node tools/test-packaged.js` (ffmpeg embutido, cópia e conversão, exibição, guardião) e com `tools/test-fluxo.js --exe=...` (abrir, iniciar, Esc, barra de tarefas), mas o programa de instalação em si (`GiroPlay Setup x.y.z.exe`) não foi executado por mim, e a opção de abrir com o Windows só age no app instalado.
 - Vídeos HDR (não há conversão de tons) e imagens estáticas.
 
 ---
@@ -209,8 +247,9 @@ src/main/
 src/renderer/    player.* (2 camadas sem corte) e settings.* (janela de configurações)
 src/preload/     ponte segura entre as janelas e o processo principal
 test/            testes do porteiro e da biblioteca
-tools/           measure.js (medição de ponta a ponta), test-guardian.js, test-packaged.js,
-                 shot-settings.js (foto da janela de configurações), make-icon.js
+tools/           measure.js (medição de ponta a ponta), test-fluxo.js (abrir/iniciar/sair),
+                 test-guardian.js, test-packaged.js, shot-settings.js (foto das configurações),
+                 topwindow.ps1 e windows-stack.ps1 (qual janela está na frente), make-icon.js
 ```
 
 Decisões de projeto:
@@ -227,13 +266,13 @@ Requisitos: Windows e Node.js 22 ou mais novo (testado com a versão 24).
 
 ```bash
 npm install
-npm start            # abre o app (primeira vez: janela de configurações)
+npm start            # abre o app (sempre nas configurações; ▶ Iniciar começa a exibir)
 npm test             # 21 testes do porteiro e da biblioteca
 npm run medir        # medição de ponta a ponta (veja tools/measure.js)
 npm run dist         # gera o instalador em dist/
 ```
 
-Opções de linha de comando (úteis para teste): `--windowed=640x360+40+40` (janela em vez de tela cheia), `--watch=PASTA`, `--giro-data=PASTA` (dados do app em outro lugar), `--no-guardian`, `--cfg=chave=valor`, `--echo` (log no terminal).
+Opções de linha de comando: `--play` (começa exibindo direto, útil num atalho do painel), `--windowed=640x360+40+40` (janela de teste em vez de tela cheia; já começa exibindo), `--watch=PASTA`, `--giro-data=PASTA` (dados do app em outro lugar), `--no-guardian`, `--cfg=chave=valor`, `--echo` (log no terminal), `--retomar` (usado pelo guardião), `--test-script=SEG:ação,...` e `--exit-after=SEG` (só para os testes).
 
 Medição:
 
@@ -242,6 +281,8 @@ node tools/measure.js --seconds=60                 # janela pequena
 node tools/measure.js --seconds=60 --fullscreen    # tela cheia (cobre a tela por ~2 min)
 node tools/measure.js --soak --seconds=900         # memória durante a exibição
 node tools/test-guardian.js
+node tools/test-fluxo.js                           # abrir / ▶ Iniciar / Esc / sair (cobre a tela por segundos)
+node tools/test-fluxo.js --exe=dist/win-unpacked/GiroPlay.exe   # o mesmo, no app empacotado
 ```
 
 ---
@@ -250,12 +291,29 @@ node tools/test-guardian.js
 
 | Sintoma | O que verificar |
 |---|---|
+| O painel está em tela cheia e não consigo sair | Tecla `Esc` (menu), `Esc` de novo sai. Se o teclado não responder: `Ctrl + Alt + G` ou `Ctrl + Shift + G`; o ícone do GiroPlay na bandeja; ou o Gerenciador de Tarefas (`Ctrl + Shift + Esc`) |
+| Abre e não toca nada | É o esperado até clicar em **▶ Iniciar painel** (ou marcar "Iniciar o painel sozinho") |
 | "Pasta inacessível" | O Google Drive está aberto e conectado? O painel segue tocando a cópia local |
 | Vídeo não aparece no ciclo | Veja `STATUS.txt` ou a janela de configurações: pode estar esperando terminar de chegar, na fila de conversão ou **recusado** (motivo anotado) |
 | Vídeo recusado | Reenvie o arquivo inteiro. Se continuar, abra-o no computador: se não abre lá, está corrompido |
 | Faixas pretas nas laterais | Normal em `fit=contain`. Para preencher a tela use `cover` (corta as bordas) |
 | Painel mostra só uma parte da imagem | Ajuste a resolução do Windows para a que a controladora do painel espera |
 | Ver o que aconteceu | `%LOCALAPPDATA%\GiroPlay\logs` (botão "Abrir registros" nas configurações) |
+
+---
+
+## Histórico de versões
+
+**0.1.1**
+- O app **abre sempre nas configurações** e só vai para a tela cheia depois de **▶ Iniciar painel** (ou com "iniciar sozinho" ligado / `--play`).
+- **Esc** abre um menu de saída dentro do painel; Esc de novo sai. **Alt+F4** abre o mesmo menu. Dois atalhos globais (`Ctrl+Alt+G`, `Ctrl+Shift+G`).
+- O painel agora **cobre a barra de tarefas do Windows** (antes ficava 41 px menor que a tela e a barra aparecia embaixo).
+- As configurações ficam **sempre por cima** do painel, com o pedido de "sempre por cima" conferido e reafirmado.
+- O guardião só sobe quando a exibição começa e reabre o app já exibindo (`--retomar`).
+- Novo teste de ponta a ponta do fluxo (`tools/test-fluxo.js`).
+
+**0.1.0** (primeiro uso com defeito)
+- Ao abrir pela primeira vez, o painel entrava direto em tela cheia, **por cima de tudo** (mas deixando a barra de tarefas do Windows aparecendo), e o usuário ficou sem acesso às configurações nem como sair: só o Gerenciador de Tarefas encerrou o app (os logs do PC mostram o app rodando 3 min sem nenhuma configuração salva e depois todos os processos encerrados de uma vez). Pelo código, a causa provável é que a janela de configurações abria e logo era coberta pelo painel "sempre por cima"; o atalho só reabria a janela por baixo dele, e o Alt+F4 era bloqueado de propósito. Não vi a tela do usuário para confirmar; o conserto da 0.1.1 elimina todos esses caminhos e está coberto por teste.
 
 ---
 

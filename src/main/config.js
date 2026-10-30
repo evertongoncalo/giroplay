@@ -26,7 +26,8 @@ const DEFAULTS = Object.freeze({
   ioAttempts: 6,
   ioRetrySec: 15,
 
-  launchAtLogin: false,
+  launchAtLogin: false, // abrir o GiroPlay junto com o Windows (só no app instalado)
+  autoStart: false, // começar a exibir sozinho ao abrir; desligado, o app abre nas configurações e espera o ▶ Iniciar
   guardian: true, // reabre o app sozinho se o processo morrer ou travar
   statusToDrive: true, // grava STATUS.txt dentro da pasta do Drive
   ffmpegPath: '',

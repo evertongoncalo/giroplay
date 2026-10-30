@@ -47,7 +47,7 @@ async function makeClips(dir) {
 function launchApp(work, exitAfter) {
   const electronExe = require('electron');
   const argv = [root, `--giro-data=${path.join(work, 'dados')}`, `--watch=${path.join(work, 'drive')}`,
-    ...(FULL ? [] : [`--windowed=${WIN.w}x${WIN.h}+${WIN.x}+${WIN.y}`]), '--no-guardian', `--exit-after=${exitAfter}`,
+    ...(FULL ? ['--play'] : [`--windowed=${WIN.w}x${WIN.h}+${WIN.x}+${WIN.y}`]), '--no-guardian', `--exit-after=${exitAfter}`,
     `--stats-out=${path.join(work, 'trocas.json')}`, `--mem-out=${path.join(work, 'memoria.jsonl')}`,
     '--cfg=stableSeconds=1', '--cfg=scanIntervalSec=0.5', '--cfg=statusToDrive=false'];
   const child = spawn(electronExe, argv, { stdio: ['ignore', 'pipe', 'pipe'] });

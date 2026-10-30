@@ -12,6 +12,22 @@
     <div class="mark">GiroPlay</div>
     <div class="hint">Aguardando vídeos na pasta</div>
   </div>
+
+  <!-- Menu de saída (tecla Esc). Fica dentro desta página: nenhuma janela do Windows passa na frente dele. -->
+  <div id="menu" hidden>
+    <div class="card">
+      <div class="title">GiroPlay</div>
+      <div class="line">Aperte <kbd>Esc</kbd> de novo para <b>sair</b></div>
+      <div class="buttons">
+        <button type="button" data-menu="quit" class="danger">Sair do GiroPlay <kbd>Esc</kbd></button>
+        <button type="button" data-menu="settings">Configurações <kbd>C</kbd></button>
+        <button type="button" data-menu="stop">Parar exibição <kbd>P</kbd></button>
+        <button type="button" data-menu="back" class="primary">Voltar <kbd>Enter</kbd></button>
+      </div>
+      <div class="hint">O painel continua passando por trás. Este menu some sozinho.</div>
+    </div>
+  </div>
+
   <script src="player.js"></script>
 </body>
 </html>

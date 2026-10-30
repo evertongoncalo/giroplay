@@ -9,6 +9,11 @@ contextBridge.exposeInMainWorld('giro', {
   played: (record) => ipcRenderer.send('player:played', record),
   error: (id, message) => ipcRenderer.send('player:error', id, message),
   log: (level, message) => ipcRenderer.send('player:log', level, message),
+  // menu de saída (Esc)
+  quit: () => ipcRenderer.send('player:quit'),
+  openSettings: () => ipcRenderer.send('player:open-settings'),
+  stop: () => ipcRenderer.send('player:stop'),
+  onMenu: (cb) => ipcRenderer.on('menu:show', () => cb()),
   onPlaylistChanged: (cb) => ipcRenderer.on('playlist:changed', () => cb()),
   onConfigChanged: (cb) => ipcRenderer.on('config:changed', (_event, cfg) => cb(cfg)),
 });

@@ -49,6 +49,55 @@ function setStandby(on) {
   standbyEl.hidden = !on;
 }
 
+// ---------- Menu de saída (tecla Esc) ----------
+// Esc abre o menu; Esc de novo sai do GiroPlay. O menu vive dentro desta página, então nenhuma
+// janela do Windows consegue ficar na frente dele, e o painel segue passando por trás.
+const menuEl = document.getElementById('menu');
+let menuTimer = null;
+let menuOpenedAt = 0;
+
+function showMenu() {
+  if (menuEl.hidden) log('info', 'menu de saída aberto');
+  menuEl.hidden = false;
+  document.body.classList.add('menu-open');
+  menuOpenedAt = Date.now();
+  clearTimeout(menuTimer);
+  menuTimer = setTimeout(hideMenu, 15000);
+}
+
+function hideMenu() {
+  menuEl.hidden = true;
+  document.body.classList.remove('menu-open');
+  clearTimeout(menuTimer);
+}
+
+function menuAction(name) {
+  if (name === 'quit') api.quit();
+  else if (name === 'settings') { hideMenu(); api.openSettings(); }
+  else if (name === 'stop') api.stop();
+  else hideMenu();
+}
+
+window.addEventListener('keydown', (event) => {
+  if (event.repeat) return; // segurar a tecla não pode contar como "Esc de novo"
+  const key = event.key.length === 1 ? event.key.toLowerCase() : event.key;
+  if (key === 'Escape') {
+    event.preventDefault();
+    if (menuEl.hidden) showMenu();
+    else if (Date.now() - menuOpenedAt > 150) menuAction('quit');
+    return;
+  }
+  if (menuEl.hidden) return;
+  if (key === 'Enter' || key === ' ') menuAction('back');
+  else if (key === 'c') menuAction('settings');
+  else if (key === 'p') menuAction('stop');
+});
+
+menuEl.addEventListener('click', (event) => {
+  const button = event.target.closest('[data-menu]');
+  if (button) menuAction(button.dataset.menu);
+});
+
 function mediaErrorText(el) {
   return el.error ? `erro de mídia ${el.error.code}${el.error.message ? `: ${el.error.message}` : ''}` : 'erro de mídia';
 }
@@ -300,6 +349,7 @@ async function main() {
     if (refreshHook && !swapping) refreshHook();
   });
   api.onConfigChanged(applyConfig);
+  api.onMenu(showMenu);
   applyConfig(await api.config());
   log('info', 'player iniciado');
 

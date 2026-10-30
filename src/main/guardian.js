@@ -43,7 +43,9 @@ function relaunch() {
     // O guardião roda com ELECTRON_RUN_AS_NODE; o app reaberto precisa rodar como app, não como Node.
     const env = { ...process.env };
     delete env.ELECTRON_RUN_AS_NODE;
-    const child = spawn(exe, appArgs, { detached: true, stdio: 'ignore', env });
+    // --retomar: o app volta já exibindo se estava exibindo quando caiu (sem esperar o ▶ Iniciar).
+    const args = appArgs.includes('--retomar') ? appArgs : [...appArgs, '--retomar'];
+    const child = spawn(exe, args, { detached: true, stdio: 'ignore', env });
     child.unref();
     process.exit(0);
   }, delay);

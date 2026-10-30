@@ -3,6 +3,7 @@ const api = window.giroSettings;
 const $ = (id) => document.getElementById(id);
 
 let formReady = false;
+let playing = false;
 
 function fmt(sec) {
   const s = Math.round(sec);
@@ -19,15 +20,15 @@ function fillForm(state) {
   const c = state.config;
   $('folder').value = c.watchFolder || '';
   $('fit').value = c.fit;
-  $('autostart').checked = c.launchAtLogin;
-  $('autostart').disabled = !state.packaged;
-  $('autostartNote').textContent = state.packaged ? '' : '(só no app instalado)';
+  $('autoStart').checked = c.autoStart;
+  $('login').checked = c.launchAtLogin;
+  $('login').disabled = !state.packaged;
+  $('loginNote').textContent = state.packaged ? '' : '(só no app instalado)';
   $('statusDrive').checked = c.statusToDrive;
 
   const select = $('display');
   select.replaceChildren();
-  const auto = new Option('Automático (usa a segunda tela, se houver)', '');
-  select.add(auto);
+  select.add(new Option('Automático (usa a segunda tela, se houver)', ''));
   state.displays.forEach((d, i) => {
     select.add(new Option(`Tela ${i + 1} · ${d.width}×${d.height}${d.primary ? ' (principal)' : ''}`, String(d.id)));
   });
@@ -35,16 +36,39 @@ function fillForm(state) {
   formReady = true;
 }
 
+function collect() {
+  return {
+    watchFolder: $('folder').value,
+    displayId: $('display').value === '' ? null : Number($('display').value),
+    fit: $('fit').value,
+    autoStart: $('autoStart').checked,
+    launchAtLogin: $('login').checked,
+    statusToDrive: $('statusDrive').checked,
+  };
+}
+
 function render(state) {
+  playing = state.playing;
   $('welcome').hidden = !state.firstRun;
   const ing = state.ingest;
+  const hasFolder = Boolean($('folder').value);
 
-  if (!state.config.watchFolder) setPill('Sem pasta', 'warn');
+  if (!hasFolder) setPill('Sem pasta', 'warn');
   else if (ing.folderOk === false) setPill('Pasta inacessível', 'bad');
+  else if (!playing) setPill('Parado', 'idle');
   else if (state.nowPlaying) setPill('No ar', 'ok');
   else setPill('Aguardando vídeos', 'warn');
 
-  $('now').textContent = state.nowPlaying ? state.nowPlaying.name : 'Nada tocando';
+  $('play').hidden = playing;
+  $('stop').hidden = !playing;
+  $('play').disabled = !hasFolder;
+  $('playHint').textContent = playing
+    ? 'O painel está no ar em tela cheia. Para sair dele: tecla Esc (aperte duas vezes).'
+    : hasFolder
+      ? 'O painel abre em tela cheia. Para sair dele: tecla Esc (aperte duas vezes).'
+      : 'Escolha primeiro a pasta de vídeos para poder iniciar.';
+
+  $('now').textContent = state.nowPlaying ? state.nowPlaying.name : playing ? 'Nada tocando' : 'Painel parado';
   $('cycle').textContent = state.playlist.length
     ? `${state.playlist.length} vídeo(s) no ciclo · ${fmt(state.totalSeconds)} para dar uma volta completa`
     : 'Nenhum vídeo pronto ainda';
@@ -97,21 +121,34 @@ async function refresh() {
   }
 }
 
+function flash(text) {
+  $('saved').textContent = text;
+  setTimeout(() => { $('saved').textContent = ''; }, 3000);
+}
+
 $('pick').addEventListener('click', async () => {
   const folder = await api.pickFolder();
-  if (folder) $('folder').value = folder;
+  if (folder) {
+    $('folder').value = folder;
+    refresh();
+  }
 });
 
 $('save').addEventListener('click', async () => {
-  await api.save({
-    watchFolder: $('folder').value,
-    displayId: $('display').value === '' ? null : Number($('display').value),
-    fit: $('fit').value,
-    launchAtLogin: $('autostart').checked,
-    statusToDrive: $('statusDrive').checked,
-  });
-  $('saved').textContent = 'Salvo ✓';
-  setTimeout(() => { $('saved').textContent = ''; }, 2500);
+  await api.save(collect());
+  flash('Salvo ✓');
+  refresh();
+});
+
+$('play').addEventListener('click', async () => {
+  $('play').disabled = true;
+  const result = await api.play(collect());
+  if (!result.ok) flash(result.error);
+  refresh();
+});
+
+$('stop').addEventListener('click', async () => {
+  await api.stop();
   refresh();
 });
 

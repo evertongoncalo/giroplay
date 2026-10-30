@@ -15,23 +15,10 @@
   <main>
     <section id="welcome" class="card accent" hidden>
       <h2>Bem-vindo!</h2>
-      <p>Escolha abaixo a pasta que está sincronizada com o Google Drive e clique em <b>Salvar</b>.
-        Tudo que for enviado para essa pasta entra no final do ciclo do painel, sozinho, sem interromper o vídeo que está passando.</p>
-    </section>
-
-    <section class="card">
-      <h2>No painel agora</h2>
-      <div id="now" class="big">—</div>
-      <div id="cycle" class="muted"></div>
-      <ol id="playlist"></ol>
-    </section>
-
-    <section class="card">
-      <h2>Entrada de vídeos</h2>
-      <div id="ingest">—</div>
-      <div id="barWrap" class="bar" hidden><div id="bar"></div></div>
-      <div id="waiting" class="muted"></div>
-      <ul id="rejected" class="rejected"></ul>
+      <p><b>1.</b> Escolha a pasta que está sincronizada com o Google Drive.<br>
+        <b>2.</b> Confira a tela do painel e clique em <b>▶ Iniciar painel</b>.<br>
+        Tudo que for enviado para a pasta entra no final do ciclo, sozinho, sem interromper o vídeo que está passando.
+        Para fechar o painel depois, aperte <b>Esc</b> duas vezes.</p>
     </section>
 
     <section class="card">
@@ -53,13 +40,32 @@
         <option value="fill">Esticar (deforma a imagem)</option>
       </select>
 
-      <label class="check"><input id="autostart" type="checkbox"> <span>Abrir o GiroPlay junto com o Windows <small id="autostartNote" class="muted"></small></span></label>
+      <label class="check"><input id="autoStart" type="checkbox"> <span>Iniciar o painel sozinho assim que o GiroPlay abrir <small class="muted">(marque no PC do painel, para ele voltar sozinho depois de reiniciar)</small></span></label>
+      <label class="check"><input id="login" type="checkbox"> <span>Abrir o GiroPlay junto com o Windows <small id="loginNote" class="muted"></small></span></label>
       <label class="check"><input id="statusDrive" type="checkbox"> <span>Gravar o relatório STATUS.txt dentro da pasta do Drive (para ver pelo celular se o painel está no ar)</span></label>
 
-      <div class="row end">
+      <div class="actions">
+        <button id="play" class="play" type="button">▶ Iniciar painel</button>
+        <button id="stop" class="stop" type="button" hidden>■ Parar exibição</button>
+        <button id="save" type="button">Salvar</button>
         <span id="saved" class="muted"></span>
-        <button id="save" class="primary" type="button">Salvar</button>
       </div>
+      <div id="playHint" class="muted hint"></div>
+    </section>
+
+    <section class="card">
+      <h2>No painel agora</h2>
+      <div id="now" class="big">—</div>
+      <div id="cycle" class="muted"></div>
+      <ol id="playlist"></ol>
+    </section>
+
+    <section class="card">
+      <h2>Entrada de vídeos</h2>
+      <div id="ingest">—</div>
+      <div id="barWrap" class="bar" hidden><div id="bar"></div></div>
+      <div id="waiting" class="muted"></div>
+      <ul id="rejected" class="rejected"></ul>
     </section>
 
     <section class="card">

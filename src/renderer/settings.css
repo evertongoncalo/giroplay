@@ -47,6 +47,7 @@ header {
   background: #232838;
   color: var(--muted);
 }
+.pill.idle { background: #232838; color: var(--text); }
 .pill.ok { background: #12342a; color: var(--ok); }
 .pill.warn { background: #3a2f10; color: var(--warn); }
 .pill.bad { background: #3b1717; color: var(--bad); }
@@ -108,6 +109,14 @@ button {
 button:hover { border-color: var(--accent); }
 button.primary { background: var(--accent); border-color: var(--accent); font-weight: 600; }
 button.danger { color: var(--bad); }
+button:disabled { opacity: 0.45; cursor: not-allowed; }
+button:disabled:hover { border-color: var(--line); }
+
+.actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 18px; }
+button.play, button.stop { padding: 12px 22px; font-size: 16px; font-weight: 700; }
+button.play { background: var(--accent); border-color: var(--accent); color: #fff; }
+button.stop { background: #3b1717; border-color: #6b2a2a; color: var(--bad); }
+.hint { margin-top: 10px; font-size: 13px; }
 
 .tools { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 8px; }
 

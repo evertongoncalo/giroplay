@@ -35,7 +35,7 @@ body[data-fit="fill"] video.layer { object-fit: fill; }
 #standby {
   position: fixed;
   inset: 0;
-  z-index: 3;
+  z-index: 2000000000; /* sempre acima dos vídeos, cujo z-index só cresce */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -56,3 +56,60 @@ body[data-fit="fill"] video.layer { object-fit: fill; }
   color: transparent;
 }
 #standby .hint { font-size: 3.2vmin; opacity: 0.6; }
+
+/* ---------- Menu de saída (Esc) ---------- */
+body.menu-open { cursor: default; }
+#menu {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483647;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.45);
+  font-family: "Segoe UI", system-ui, sans-serif;
+  color: #e8eaf2;
+}
+#menu[hidden] { display: none; }
+#menu .card {
+  width: min(520px, 90vw);
+  padding: 26px 28px;
+  border-radius: 14px;
+  background: #171a23;
+  border: 1px solid #343b4f;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+}
+#menu .title {
+  font-size: 24px;
+  font-weight: 700;
+  background: linear-gradient(90deg, #7c5cff, #22d3ee);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+#menu .line { margin: 6px 0 18px; font-size: 16px; color: #c9cde0; }
+#menu .buttons { display: grid; gap: 10px; }
+#menu button {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-radius: 10px;
+  border: 1px solid #343b4f;
+  background: #232838;
+  color: #e8eaf2;
+  font: 600 16px "Segoe UI", system-ui, sans-serif;
+  cursor: pointer;
+}
+#menu button:hover { border-color: #7c5cff; }
+#menu button.primary { background: #7c5cff; border-color: #7c5cff; }
+#menu button.danger { color: #f87171; }
+#menu kbd {
+  padding: 1px 8px;
+  border-radius: 6px;
+  border: 1px solid #4a5270;
+  background: rgba(0, 0, 0, 0.25);
+  font: 600 13px "Segoe UI", system-ui, sans-serif;
+  color: #c9cde0;
+}
+#menu .hint { margin-top: 14px; font-size: 13px; color: #8b92a7; }
